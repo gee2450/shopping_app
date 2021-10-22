@@ -2,17 +2,16 @@ package com.example.shoppingapp;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class SignupActivity extends AppCompatActivity {
-    ImageButton btnExit;
-
     Button btnBasicInfo;
     Button btnNext;
     Button btnCompleteSignUp;
@@ -24,24 +23,15 @@ public class SignupActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
 
-        btnExit = (ImageButton) findViewById(R.id.btnExit);
+        // 뒤로가기 버튼 생성
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         btnBasicInfo = (Button) findViewById(R.id.btnBasicInfo);
         btnNext = (Button) findViewById(R.id.btnNext);
         btnCompleteSignUp = (Button) findViewById(R.id.btnCompleteSignUp);
 
         basicInfoContents = (LinearLayout) findViewById(R.id.basicInfoContents);
 
-        btnExit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(getApplicationContext(), "로그인", Toast.LENGTH_SHORT).show();
-
-                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-                startActivity(intent);
-
-                finish();
-            }
-        });
         btnBasicInfo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -67,5 +57,17 @@ public class SignupActivity extends AppCompatActivity {
                 finish();
             }
         });
+    }
+
+    // 뒤로가기 버튼 코드 구현
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
+            case android.R.id.home:{ // android.R.id.home : toolbar 의back
+                finish();
+                return true;
+            }
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
