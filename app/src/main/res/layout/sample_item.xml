@@ -12,7 +12,8 @@
         app:cardCornerRadius="10dp"
         app:cardElevation="@dimen/cardview_default_elevation"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        android:clickable="false">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -21,10 +22,11 @@
 
             <ImageView
                 android:id="@+id/cloth"
-                android:layout_width="80dp"
-                android:layout_height="80dp"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
                 android:layout_weight="1"
-                android:scaleType="fitXY"
+                android:scaleType="centerCrop"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:srcCompat="@tools:sample/backgrounds/scenic[2]" />
@@ -34,10 +36,20 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
-                android:textSize="15pt"
+                android:textSize="11pt"
                 android:text="TextView"
                 app:layout_constraintStart_toEndOf="@+id/cloth"
                 app:layout_constraintTop_toTopOf="@+id/cloth" />
+
+            <TextView
+                android:id="@+id/clothPrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="9dp"
+                android:text="TextView"
+                android:textSize="9pt"
+                app:layout_constraintStart_toEndOf="@+id/cloth"
+                app:layout_constraintTop_toBottomOf="@+id/clothName" />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>

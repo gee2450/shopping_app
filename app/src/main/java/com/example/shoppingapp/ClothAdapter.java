@@ -41,11 +41,13 @@ public class ClothAdapter extends BaseAdapter {
     public View getView(int position, View converView, ViewGroup parent) {
         View view = mLayoutInflater.inflate(R.layout.sample_item, null);
 
-        ImageView imageView = (ImageView)view.findViewById(R.id.cloth);
-        TextView movieName = (TextView)view.findViewById(R.id.clothName);
+        ImageView imageView = (ImageView) view.findViewById(R.id.cloth);
+        TextView clothName = (TextView) view.findViewById(R.id.clothName);
+        TextView clothPrice = (TextView) view.findViewById(R.id.clothPrice);
 
         imageView.setImageResource(sample.get(position).getCloth());
-        movieName.setText(sample.get(position).getClothName());
+        clothName.setText(sample.get(position).getClothName());
+        clothPrice.setText(sample.get(position).getClothPrice()+"원");
 
         return view;
     }
