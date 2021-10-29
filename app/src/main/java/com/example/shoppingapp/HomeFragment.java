@@ -72,12 +72,6 @@ public class HomeFragment extends Fragment {
         return rootView;
     }
 
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.top_menu_add_items, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
     private void saveImageToTable() {
         SQLiteDatabase db = mDBHelper.getWritableDatabase();
 
