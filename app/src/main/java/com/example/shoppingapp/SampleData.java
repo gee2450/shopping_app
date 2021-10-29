@@ -14,6 +14,8 @@ public class SampleData {
         this.cloth = cloth;
         this.clothName = clothName;
         this.clothPrice = clothPrice;
+
+        click = false;
     }
 
     public int getClothId() {

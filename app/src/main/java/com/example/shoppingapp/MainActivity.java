@@ -2,6 +2,8 @@ package com.example.shoppingapp;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -30,11 +32,20 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigationView.setOnItemSelectedListener(item -> {
             switch (item.getItemId()) {
                 case R.id.main_menu_item_delete:
-                case R.id.main_menu_item_home:
+                    Toast.makeText(getApplicationContext(), "delete", Toast.LENGTH_SHORT).show();
+                    HomeFragment.instance.setButtonVisibility(View.GONE, View.VISIBLE);
                     getSupportFragmentManager().beginTransaction().replace(R.id.mainContainer, homeFragment).commit();
+                    HomeFragment.instance.ResetItemArray();
+                    break;
+                case R.id.main_menu_item_home:
+                    Toast.makeText(getApplicationContext(), "home", Toast.LENGTH_SHORT).show();
+                    HomeFragment.instance.setButtonVisibility(View.VISIBLE, View.GONE);
+                    getSupportFragmentManager().beginTransaction().replace(R.id.mainContainer, homeFragment).commit();
+                    HomeFragment.instance.ResetItemArray();
                     break;
                 case R.id.main_menu_item_profile:
                     if (true) {
+                        Toast.makeText(getApplicationContext(), "profile", Toast.LENGTH_SHORT).show();
                         getSupportFragmentManager().beginTransaction().replace(R.id.mainContainer, profileFragment).commit();
                     }
                     else {

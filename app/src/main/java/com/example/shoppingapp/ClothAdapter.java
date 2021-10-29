@@ -16,10 +16,12 @@ import java.util.ArrayList;
 public class ClothAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     ArrayList<SampleData> sample = new ArrayList<>();
-    ViewGroup homeFragment;
+    HomeFragment homeFragment;
+    ViewGroup viewGroup;
 
-    ClothAdapter(ViewGroup homeFragment) {
+    ClothAdapter(HomeFragment homeFragment, ViewGroup viewGroup) {
         this.homeFragment = homeFragment;
+        this.viewGroup = viewGroup;
     }
 
     @NonNull
@@ -43,6 +45,14 @@ public class ClothAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         sample.add(data);
     }
 
+    public void deleteItem(int itemId) {
+        for (SampleData data : sample) {
+            if (data.getClothId() == itemId) {
+                sample.remove(sample.indexOf(data));
+            }
+        }
+    }
+
     @Override
     public int getItemCount() {
         return sample.size();
@@ -64,13 +74,15 @@ public class ClothAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (homeFragment.findViewById(R.id.btnDelete).getVisibility() != View.VISIBLE) {
+                    if (viewGroup.findViewById(R.id.btnDelete).getVisibility() != View.VISIBLE) {
                         return;
                     }
                     if (data.isClick()) {
+                        homeFragment.RemoveItemArray(data.getClothId());
                         sampleData.setBackgroundColor(Color.WHITE);
                     }
                     else {
+                        homeFragment.AddItemArray(data.getClothId());
                         sampleData.setBackgroundColor(Color.parseColor("#11111111"));
                     }
                     data.setClick(!data.isClick());
