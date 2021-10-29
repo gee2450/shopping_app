@@ -37,15 +37,23 @@
                 android:id="@+id/editTextId"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:ems="10"
+                android:ems="15"
                 android:inputType="textPersonName"
                 android:hint="id" />
+
+            <TextView
+                android:id="@+id/pwHelper"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:ems="15"
+                android:text="pwHelper"/>
 
             <EditText
                 android:id="@+id/editTextPw"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:ems="10"
+                android:ems="15"
                 android:hint="password"
                 android:inputType="textPassword" />
 
@@ -53,7 +61,7 @@
                 android:id="@+id/editTextRepw"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:ems="10"
+                android:ems="15"
                 android:hint="rePassword"
                 android:inputType="textPassword" />
 
@@ -69,13 +77,18 @@
 
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_marginHorizontal="20dp"
-        android:paddingVertical="15dp"
+    <Button
+        android:id="@+id/btnDetailInfo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="상세 정보" />
+        android:padding="0dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginHorizontal="20dp"
+        android:text="상세 정보"
+        android:textColor="@color/black"
+        android:textAlignment="textStart"
+        android:clickable="false"
+        android:background="#00000000"/>
 
     <LinearLayout
         android:id="@+id/detailInfoContents"

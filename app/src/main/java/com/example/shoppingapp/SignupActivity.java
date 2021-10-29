@@ -4,14 +4,19 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.textfield.TextInputEditText;
@@ -19,6 +24,8 @@ import com.google.android.material.textfield.TextInputEditText;
 import java.sql.SQLInput;
 
 public class SignupActivity extends AppCompatActivity {
+    private final int pwMinLength = 10;
+
     private MySQLite mDBHelpher;
 
     private EditText idInput;
@@ -33,6 +40,8 @@ public class SignupActivity extends AppCompatActivity {
     private Button btnCompleteSignUp;
 
     private LinearLayout basicInfoContents;
+
+    private String signUpDisagreeReason;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +60,10 @@ public class SignupActivity extends AppCompatActivity {
         nameInput = (EditText) findViewById(R.id.editTextName);
         phoneNumInput = (EditText) findViewById(R.id.editTextPhone);
         addressInput = (EditText) findViewById(R.id.editTextAddress);
+
+        TextView pwHelper = (TextView) findViewById(R.id.pwHelper);
+        pwHelper.setText("비밀번호는 최소 "+pwMinLength+"자 이상, \n" +
+                "그리고 숫자, 특수기호가 포함되게 작성해주세요.");
 
         // Button 연동
         btnBasicInfo = (Button) findViewById(R.id.btnBasicInfo);
@@ -71,11 +84,18 @@ public class SignupActivity extends AppCompatActivity {
         btnNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                boolean result = checkPassword();
+                boolean result = CheckPassword();
 
                 if (result) {
                     basicInfoContents.setVisibility(View.GONE);
                     btnBasicInfo.setClickable(true);
+                }
+                else {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(SignupActivity.this);
+                    builder.setTitle("Error");
+                    builder.setMessage(signUpDisagreeReason);
+                    builder.setNeutralButton("OK", null);
+                    builder.create().show();
                 }
             }
         });
@@ -94,14 +114,46 @@ public class SignupActivity extends AppCompatActivity {
         });
     }
 
-    private boolean checkPassword() {
+    private boolean CheckPassword() {
         String pw = pwInput.getText().toString();
         String repw = repwInput.getText().toString();
 
-        // password 특수 규칙 적용
+        if (pw == null) {
+            signUpDisagreeReason = "비밀번호가 비어있습니다. ";
+            return false;
+        }
 
-        if (!pw.equals(repw)) return false;
-        if (pw == null) return false;
+        if (pw.length() < pwMinLength) {
+            signUpDisagreeReason = "비밀번호는 "+pwMinLength+"자 이상이어야합니다. ";
+            return false;
+        }
+
+        if (!pw.matches(".*[a-zA-Z].*")) {
+            signUpDisagreeReason = "비밀번호에 알파벳이 포함되어있지 않습니다. ";
+            return false;
+        }
+
+        if (!pw.matches(".*[0-9].*")) {
+            signUpDisagreeReason = "비밀번호에 숫자가 포함되어있지 않습니다. ";
+            return false;
+        }
+
+        boolean sResult = false;
+        for (int i = 0; i < pw.length(); i++) {
+            if (!Character.isLetterOrDigit(pw.charAt(i))) {
+                sResult = true;
+                break;
+            }
+        }
+        if (!sResult) {
+            signUpDisagreeReason = "비밀번호에 특수기호가 포함되어있지 않습니다. ";
+            return false;
+        }
+
+        if (!pw.equals(repw)) {
+            signUpDisagreeReason = "비밀번호와 확인 비밀번호가 다릅니다. ";
+            return false;
+        }
 
         return true;
     }
