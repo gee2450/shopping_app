@@ -37,10 +37,14 @@ import java.io.ByteArrayOutputStream;
 public class AddItemActivity extends AppCompatActivity {
     private ImageView imageView;
 
+    ClothAdapter adapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_item);
+
+        adapter = HomeFragment.instance.adapter;
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -60,6 +64,7 @@ public class AddItemActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 AddItem();
+                finish();
             }
         });
     }
@@ -85,28 +90,38 @@ public class AddItemActivity extends AppCompatActivity {
         EditText clothName = (EditText) findViewById(R.id.editTextAddItemName);
         EditText clothPrice = (EditText) findViewById(R.id.editTextAddItemPrice);
 
+        // 가장 큰 itemId 가져오기 위해 SQLite에서 모든 아이템 id 가져오기
         Cursor cur = db.query("items", new String[]{"itemId"}, null, null, null, null, "itemId");
         cur.moveToLast();
         int biggestId = Integer.parseInt(cur.getString(0));
         Log.d("a", ""+biggestId);
 
+        // 이미지 변환
         BitmapDrawable drawable = (BitmapDrawable) imageView.getDrawable();
         Bitmap itemImage = drawable.getBitmap();
         ByteArrayOutputStream baos= new ByteArrayOutputStream();
         itemImage.compress(Bitmap.CompressFormat.JPEG, 70, baos);
         byte[] bytes = baos.toByteArray();
 
+        // 새로운 상품 정보
+        int newItemId = biggestId+1;
+        String newItemName = clothName.getText().toString();
+        int newItemPrice = Integer.parseInt(clothPrice.getText().toString());
+
         // ContentValues에 item 정보 담기
         ContentValues values = new ContentValues();
-        values.put("itemId", biggestId+1);
-        values.put("itemName", clothName.getText().toString());
-        values.put("itemPrice", Integer.parseInt(clothPrice.getText().toString()));
+        values.put("itemId", newItemId);
+        values.put("itemName", newItemName);
+        values.put("itemPrice", newItemPrice);
         values.put("itemImage", bytes);
 
         db.insert("items", null, values);
 
         db.close();
         mDBHelpher.close();
+
+        adapter.addItem(new SampleData(newItemId, itemImage, newItemName, ""+newItemPrice));
+        adapter.notifyDataSetChanged();
     }
 
     @Override
