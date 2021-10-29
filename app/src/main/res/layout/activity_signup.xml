@@ -33,13 +33,33 @@
             android:layout_weight="1"
             android:orientation="vertical">
 
-            <EditText
-                android:id="@+id/editTextId"
+            <TextView
+                android:id="@+id/idHelper"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
                 android:ems="15"
-                android:inputType="textPersonName"
-                android:hint="id" />
+                android:text="idHelper" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <EditText
+                    android:id="@+id/editTextId"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="15"
+                    android:inputType="textPersonName"
+                    android:layout_toLeftOf="@id/btnCheckId"
+                    android:hint="id" />
+
+                <Button
+                    android:id="@+id/btnCheckId"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:text="중복확인" />
+            </RelativeLayout>
 
             <TextView
                 android:id="@+id/pwHelper"

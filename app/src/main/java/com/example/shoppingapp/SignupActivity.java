@@ -2,11 +2,9 @@ package com.example.shoppingapp;
 
 import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextUtils;
-import android.text.TextWatcher;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -19,14 +17,13 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.material.textfield.TextInputEditText;
-
-import java.sql.SQLInput;
+import java.util.ArrayList;
 
 public class SignupActivity extends AppCompatActivity {
+    private final int idMinLength = 4;
     private final int pwMinLength = 10;
 
-    private MySQLite mDBHelpher;
+    private MySQLite mDBHelper;
 
     private EditText idInput;
     private EditText pwInput;
@@ -35,13 +32,11 @@ public class SignupActivity extends AppCompatActivity {
     private EditText phoneNumInput;
     private EditText addressInput;
 
-    private Button btnBasicInfo;
-    private Button btnNext;
-    private Button btnCompleteSignUp;
-
     private LinearLayout basicInfoContents;
 
-    private String signUpDisagreeReason;
+    private String dialogMessage;
+
+    private String passId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +46,7 @@ public class SignupActivity extends AppCompatActivity {
         // 뒤로가기 버튼 생성
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        mDBHelpher = new MySQLite(this);
+        mDBHelper = new MySQLite(this);
 
         // EditText 연동
         idInput = (EditText) findViewById(R.id.editTextId);
@@ -61,14 +56,19 @@ public class SignupActivity extends AppCompatActivity {
         phoneNumInput = (EditText) findViewById(R.id.editTextPhone);
         addressInput = (EditText) findViewById(R.id.editTextAddress);
 
+        TextView idHelper = (TextView) findViewById(R.id.idHelper);
         TextView pwHelper = (TextView) findViewById(R.id.pwHelper);
+        idHelper.setText("아이디는 최소 "+idMinLength+"자 이상으로 작성해주세요.");
         pwHelper.setText("비밀번호는 최소 "+pwMinLength+"자 이상, \n" +
                 "그리고 숫자, 특수기호가 포함되게 작성해주세요.");
 
+        ArrayList<String> idArray = GetIdArray();
+
         // Button 연동
-        btnBasicInfo = (Button) findViewById(R.id.btnBasicInfo);
-        btnNext = (Button) findViewById(R.id.btnNext);
-        btnCompleteSignUp = (Button) findViewById(R.id.btnCompleteSignUp);
+        Button btnBasicInfo = (Button) findViewById(R.id.btnBasicInfo);
+        Button btnCheckId = (Button) findViewById(R.id.btnCheckId);
+        Button btnNext = (Button) findViewById(R.id.btnNext);
+        Button btnCompleteSignUp = (Button) findViewById(R.id.btnCompleteSignUp);
 
         // Layout 연동
         basicInfoContents = (LinearLayout) findViewById(R.id.basicInfoContents);
@@ -81,21 +81,35 @@ public class SignupActivity extends AppCompatActivity {
                 btnBasicInfo.setClickable(false);
             }
         });
+        btnCheckId.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean result = CheckId(idArray);
+                if (!result) {
+                    MakeDialog("Error");
+                }
+                else {
+                    MakeDialog("ID");
+                }
+            }
+        });
         btnNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                boolean result = CheckPassword();
+                if (passId == null || !passId.equals(idInput.getText().toString())) {
+                    dialogMessage = "아이디 중복확인을 해주세요. ";
+                    MakeDialog("Error");
+                    return;
+                }
+
+                Boolean result = CheckPassword();
 
                 if (result) {
                     basicInfoContents.setVisibility(View.GONE);
                     btnBasicInfo.setClickable(true);
                 }
                 else {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(SignupActivity.this);
-                    builder.setTitle("Error");
-                    builder.setMessage(signUpDisagreeReason);
-                    builder.setNeutralButton("OK", null);
-                    builder.create().show();
+                    MakeDialog("Error");
                 }
             }
         });
@@ -114,27 +128,71 @@ public class SignupActivity extends AppCompatActivity {
         });
     }
 
+    private ArrayList<String> GetIdArray() {
+        ArrayList<String> result = new ArrayList<String>();
+
+        SQLiteDatabase db = mDBHelper.getReadableDatabase();
+        String[] projection = {"id"};
+        Cursor cur = db.query("userTable", projection, null, null, null, null, null);
+
+        while (cur.moveToNext()) {
+            result.add(cur.getString(0));
+        }
+
+        cur.close();
+        db.close();
+
+        return result;
+    }
+
+    private void MakeDialog(String title) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(SignupActivity.this);
+        builder.setTitle(title);
+        builder.setMessage(dialogMessage);
+        builder.setPositiveButton("OK", null);
+        builder.create().show();
+    }
+
+    private boolean CheckId(ArrayList<String> idArrays) {
+        String id = idInput.getText().toString();
+        dialogMessage = "사용할 수 있는 아이디입니다. ";
+
+        if (id.length() < idMinLength) {
+            dialogMessage = "아이디는 "+idMinLength+"자 이상이어야합니다. ";
+            return false;
+        }
+
+        if (idArrays.contains(id)) {
+            dialogMessage = "이미 사용중인 아이디입니다. ";
+            return false;
+        }
+
+        passId = id;
+
+        return true;
+    }
+
     private boolean CheckPassword() {
         String pw = pwInput.getText().toString();
         String repw = repwInput.getText().toString();
 
         if (pw == null) {
-            signUpDisagreeReason = "비밀번호가 비어있습니다. ";
+            dialogMessage = "비밀번호가 비어있습니다. ";
             return false;
         }
 
         if (pw.length() < pwMinLength) {
-            signUpDisagreeReason = "비밀번호는 "+pwMinLength+"자 이상이어야합니다. ";
+            dialogMessage = "비밀번호는 "+pwMinLength+"자 이상이어야합니다. ";
             return false;
         }
 
         if (!pw.matches(".*[a-zA-Z].*")) {
-            signUpDisagreeReason = "비밀번호에 알파벳이 포함되어있지 않습니다. ";
+            dialogMessage = "비밀번호에 알파벳이 포함되어있지 않습니다. ";
             return false;
         }
 
         if (!pw.matches(".*[0-9].*")) {
-            signUpDisagreeReason = "비밀번호에 숫자가 포함되어있지 않습니다. ";
+            dialogMessage = "비밀번호에 숫자가 포함되어있지 않습니다. ";
             return false;
         }
 
@@ -146,12 +204,12 @@ public class SignupActivity extends AppCompatActivity {
             }
         }
         if (!sResult) {
-            signUpDisagreeReason = "비밀번호에 특수기호가 포함되어있지 않습니다. ";
+            dialogMessage = "비밀번호에 특수기호가 포함되어있지 않습니다. ";
             return false;
         }
 
         if (!pw.equals(repw)) {
-            signUpDisagreeReason = "비밀번호와 확인 비밀번호가 다릅니다. ";
+            dialogMessage = "비밀번호와 확인 비밀번호가 다릅니다. ";
             return false;
         }
 
@@ -166,7 +224,7 @@ public class SignupActivity extends AppCompatActivity {
             return false;
         }
 
-        SQLiteDatabase db = mDBHelpher.getWritableDatabase();
+        SQLiteDatabase db = mDBHelper.getWritableDatabase();
 
         ContentValues values = new ContentValues();
         values.put("id", idInput.getText().toString());
@@ -176,7 +234,7 @@ public class SignupActivity extends AppCompatActivity {
         values.put("address", addressInput.getText().toString());
         db.insert("userTable", null, values);
 
-        mDBHelpher.close();
+        mDBHelper.close();
         return true;
     }
 
