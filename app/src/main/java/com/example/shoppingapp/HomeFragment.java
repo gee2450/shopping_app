@@ -1,6 +1,7 @@
 package com.example.shoppingapp;
 
 import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.database.Cursor;
@@ -12,6 +13,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -23,13 +25,15 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 
 public class HomeFragment extends Fragment {
     ClothAdapter adapter;
     MySQLite mDBHelper;
+
+    private ArrayList<Integer> deleteItemsIdArray = new ArrayList<Integer>();
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -44,7 +48,7 @@ public class HomeFragment extends Fragment {
         ActionBar actionBar = ((MainActivity) getActivity()).getSupportActionBar();
         actionBar.setDisplayShowHomeEnabled(true);
 
-        adapter = new ClothAdapter();
+        adapter = new ClothAdapter(rootView);
 
         mDBHelper = new MySQLite((MainActivity)getActivity());
 
@@ -66,6 +70,35 @@ public class HomeFragment extends Fragment {
             public void onClick(View v) {
                 Intent intent = new Intent(rootView.getContext(), AddItemActivity.class);
                 startActivity(intent);
+            }
+        });
+
+        Button btnDelete = (Button) rootView.findViewById(R.id.btnDelete);
+        btnDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (deleteItemsIdArray.size() == 0) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(rootView.getContext());
+                    builder.setTitle("Delete Error");
+                    builder.setMessage("선택한 상품이 없습니다. ");
+                    builder.setNeutralButton("OK", null);
+                    builder.create().show();
+                }
+                else {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(rootView.getContext());
+                    builder.setTitle("정말로 삭제하시겠습니까?");
+                    builder.setMessage("총 "+deleteItemsIdArray.size()+"개의 상품을 삭제합니다. ");
+                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            for (int itemId : deleteItemsIdArray) {
+                                DeleteClothData(itemId);
+                            }
+                        }
+                    });
+                    builder.setNegativeButton("NO", null);
+                    builder.create().show();
+                }
             }
         });
 
@@ -99,22 +132,30 @@ public class HomeFragment extends Fragment {
         db.close();
     }
 
+    private void DeleteClothData(int id) {
+        SQLiteDatabase db = mDBHelper.getWritableDatabase();
+        db.delete("items", "itemId = ?", new String[]{ String.valueOf(id) });
+        db.close();
+    }
+
     private void InitializeClothData() {
         SQLiteDatabase db = mDBHelper.getReadableDatabase();
         String[] projection = {"itemId", "itemName", "itemPrice", "itemImage"};
         Cursor cur = db.query("items", projection, null, null, null, null, null);
 
+        int itemName_id = cur.getColumnIndex("itemId");
         int itemName_col = cur.getColumnIndex("itemName");
         int itemPrice_col = cur.getColumnIndex("itemPrice");
         int itemImage_col = cur.getColumnIndex("itemImage");
 
         while (cur.moveToNext()) {
+            int itemId = cur.getInt(itemName_id);
             String itemName = cur.getString(itemName_col);
             int itemPrice = cur.getInt(itemPrice_col);
             byte[] itemImage = cur.getBlob(itemImage_col);
             Bitmap bm = BitmapFactory.decodeByteArray(itemImage, 0, itemImage.length);
 
-            adapter.addItem(new SampleData(bm, itemName, ""+itemPrice));
+            adapter.addItem(new SampleData(itemId, bm, itemName, ""+itemPrice));
 
             Log.d("recycle",itemName + itemPrice + itemImage);
         }
