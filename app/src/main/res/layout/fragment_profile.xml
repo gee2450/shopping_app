@@ -10,31 +10,33 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <ImageView
-            android:id="@+id/imageView3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/userImage"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
             android:layout_marginTop="100dp"
+            android:src="@drawable/lian"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:src="@tools:sample/avatars" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/Name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="50dp"
+            android:textSize="25dp"
             android:text="TextView"
-            app:layout_constraintEnd_toEndOf="@+id/imageView3"
-            app:layout_constraintStart_toStartOf="@+id/imageView3"
-            app:layout_constraintTop_toBottomOf="@+id/imageView3" />
+            app:layout_constraintEnd_toEndOf="@+id/userImage"
+            app:layout_constraintStart_toStartOf="@+id/userImage"
+            app:layout_constraintTop_toBottomOf="@+id/userImage" />
 
         <TextView
             android:id="@+id/ID"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
+            android:textSize="25dp"
             android:text="TextView"
             app:layout_constraintEnd_toEndOf="@+id/Name"
             app:layout_constraintStart_toStartOf="@+id/Name"
@@ -45,6 +47,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
+            android:textSize="25dp"
             android:text="TextView"
             app:layout_constraintEnd_toEndOf="@+id/ID"
             app:layout_constraintStart_toStartOf="@+id/ID"
@@ -55,6 +58,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
+            android:textSize="25dp"
             android:text="TextView"
             app:layout_constraintEnd_toEndOf="@+id/PhoneNum"
             app:layout_constraintStart_toStartOf="@+id/PhoneNum"

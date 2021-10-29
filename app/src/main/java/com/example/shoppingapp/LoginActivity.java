@@ -21,6 +21,13 @@ public class LoginActivity extends AppCompatActivity {
     Button btnLogIn;
     Button btnMain;
 
+    boolean isGuest = true;
+    String id = "";
+    String password = "";
+    String userName = "";
+    String phoneNum = "";
+    String address = "";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,6 +61,11 @@ public class LoginActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "로그인 성공", Toast.LENGTH_SHORT).show();
 
                     Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                    intent.putExtra("isGuest", isGuest);
+                    intent.putExtra("id", id);
+                    intent.putExtra("userName", userName);
+                    intent.putExtra("phoneNum", phoneNum);
+                    intent.putExtra("address", address);
                     startActivity(intent);
                     finish();
                 }
@@ -73,19 +85,24 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private boolean logIn() {
-        String id = idInput.getText().toString();
+        id = idInput.getText().toString();
 
         SQLiteDatabase db = mDBHelper.getReadableDatabase();
-        String[] projection = {"id", "password"};
+        String[] projection = {"id", "password", "userName", "phoneNum", "address"};
         Cursor cur = db.query("userTable", projection, "id=?", new String[]{ id }, null, null, null);
 
         if (cur == null) return false;
 
         int password_col = cur.getColumnIndex("password");
-        String password = "";
+        int userName_col = cur.getColumnIndex("userName");
+        int phoneNum_col = cur.getColumnIndex("phoneNum");
+        int address_col = cur.getColumnIndex("address");
 
         while (cur.moveToNext()) {
             password = cur.getString(password_col);
+            userName = cur.getString(userName_col);
+            phoneNum = cur.getString(phoneNum_col);
+            address = cur.getString(address_col);
         }
 
         cur.close();
@@ -94,6 +111,8 @@ public class LoginActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "로그인 실패", Toast.LENGTH_SHORT).show();
             return false;
         }
+
+        isGuest = false;
 
         return true;
     }
