@@ -1,16 +1,14 @@
 package com.example.shoppingapp;
 
-import android.content.ClipData;
-import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
@@ -18,6 +16,13 @@ import java.util.ArrayList;
 public class ClothAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     ArrayList<SampleData> sample = new ArrayList<>();
+    HomeFragment homeFragment;
+    ViewGroup viewGroup;
+
+    ClothAdapter(HomeFragment homeFragment, ViewGroup viewGroup) {
+        this.homeFragment = homeFragment;
+        this.viewGroup = viewGroup;
+    }
 
     @NonNull
     @Override
@@ -40,25 +45,56 @@ public class ClothAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         sample.add(data);
     }
 
+    public void deleteItem(int itemId) {
+        for (SampleData data : sample) {
+            if (data.getClothId() == itemId) {
+                sample.remove(sample.indexOf(data));
+            }
+        }
+    }
+
     @Override
     public int getItemCount() {
         return sample.size();
     }
 
     class ItemViewHolder extends RecyclerView.ViewHolder {
+        CardView sampleData;
         ImageView imageView;
         TextView clothName;
         TextView clothPrice;
 
+        SampleData data;
+
         ItemViewHolder(View itemView) {
             super(itemView);
 
+            sampleData = (CardView) itemView.findViewById(R.id.sampleData);
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (viewGroup.findViewById(R.id.btnDelete).getVisibility() != View.VISIBLE) {
+                        return;
+                    }
+                    if (data.isClick()) {
+                        homeFragment.RemoveItemArray(data.getClothId());
+                        sampleData.setBackgroundColor(Color.WHITE);
+                    }
+                    else {
+                        homeFragment.AddItemArray(data.getClothId());
+                        sampleData.setBackgroundColor(Color.parseColor("#11111111"));
+                    }
+                    data.setClick(!data.isClick());
+                }
+            });
             imageView = (ImageView) itemView.findViewById(R.id.cloth);
             clothName = (TextView) itemView.findViewById(R.id.clothName);
             clothPrice = (TextView) itemView.findViewById(R.id.clothPrice);
         }
 
         void onBind(SampleData data) {
+            this.data = data;
             imageView.setImageBitmap(data.getCloth());
             clothName.setText(data.getClothName());
             clothPrice.setText(data.getClothPrice()+"원");
