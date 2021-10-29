@@ -1,40 +1,49 @@
 package com.example.shoppingapp;
 
-import android.content.Context;
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.ListView;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.util.ArrayList;
+import java.io.ByteArrayOutputStream;
 
 public class MainActivity extends AppCompatActivity {
-    ArrayList<SampleData> clothList;
+    ClothAdapter adapter;
+
+    MySQLite mDBHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mDBHelper = new MySQLite(this);
+        adapter = new ClothAdapter();
+
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.itemRecyclerList);
+
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(linearLayoutManager);
+
+        recyclerView.setAdapter(adapter);
+
+//        saveImageToTable();
+
         InitializeClothData();
-
-        Test();
-
-        ListView listView = (ListView)findViewById(R.id.itemList);
-        final ClothAdapter adapter = new ClothAdapter(this, clothList);
 
         BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottomNav);
         bottomNavigationView.setSelectedItemId(R.id.main_menu_item_home);
-
-        listView.setAdapter(adapter);
 
         bottomNavigationView.setOnItemSelectedListener(item -> {
             switch (item.getItemId()) {
@@ -57,41 +66,80 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+
+    private void saveImageToTable() {
+        Bitmap itemImage;
+        ByteArrayOutputStream baos;
+        byte[] bytes;
+
+        ContentValues values = new ContentValues();
+        itemImage = BitmapFactory.decodeResource(getResources(), R.drawable.shirt);
+        baos= new ByteArrayOutputStream();
+        itemImage.compress(Bitmap.CompressFormat.JPEG, 70, baos);
+        bytes = baos.toByteArray();
+        values.put("itemImage", bytes);
+        SQLiteDatabase db = mDBHelper.getWritableDatabase();
+        db.update("items", values, "itemName=?", new String[]{"와이셔츠"});
+
+        values = new ContentValues();
+        itemImage = BitmapFactory.decodeResource(getResources(), R.drawable.jeans);
+        baos= new ByteArrayOutputStream();
+        itemImage.compress(Bitmap.CompressFormat.JPEG, 70, baos);
+        bytes = baos.toByteArray();
+        values.put("itemImage", bytes);
+        db.update("items", values, "itemName=?", new String[]{"청바지"});
+
+        values = new ContentValues();
+        itemImage = BitmapFactory.decodeResource(getResources(), R.drawable.skirt);
+        baos= new ByteArrayOutputStream();
+        itemImage.compress(Bitmap.CompressFormat.JPEG, 70, baos);
+        bytes = baos.toByteArray();
+        values.put("itemImage", bytes);
+        db.update("items", values, "itemName=?", new String[]{"치마"});
+
+        values = new ContentValues();
+        itemImage = BitmapFactory.decodeResource(getResources(), R.drawable.sweatshirt);
+        baos= new ByteArrayOutputStream();
+        itemImage.compress(Bitmap.CompressFormat.JPEG, 70, baos);
+        bytes = baos.toByteArray();
+        values.put("itemImage", bytes);
+        db.update("items", values, "itemName=?", new String[]{"맨투맨"});
+
+        values = new ContentValues();
+        itemImage = BitmapFactory.decodeResource(getResources(), R.drawable.shoes);
+        baos= new ByteArrayOutputStream();
+        itemImage.compress(Bitmap.CompressFormat.JPEG, 70, baos);
+        bytes = baos.toByteArray();
+        values.put("itemImage", bytes);
+        db.update("items", values, "itemName=?", new String[]{"신발"});
+
+        db.close();
+    }
+
+
     private void InitializeClothData() {
-        clothList = new ArrayList<SampleData>();
+        SQLiteDatabase db = mDBHelper.getReadableDatabase();
+        String[] projection = {"itemId", "itemName", "itemPrice", "itemImage"};
+        Cursor cur = db.query("items", projection, null, null, null, null, null);
 
-        clothList.add(new SampleData(R.drawable.shirt, "와이셔츠", "27500"));
-        clothList.add(new SampleData(R.drawable.jeans, "청바지", "55000"));
-        clothList.add(new SampleData(R.drawable.skirt, "치마", "39900"));
-        clothList.add(new SampleData(R.drawable.sweatshirt, "맨투맨", "49900"));
-        clothList.add(new SampleData(R.drawable.shoes, "신발", "35000"));
-    }
+        int itemName_col = cur.getColumnIndex("itemName");
+        int itemPrice_col = cur.getColumnIndex("itemPrice");
+        int itemImage_col = cur.getColumnIndex("itemImage");
 
-    private void Test() {   // 선택한 이미지 내부 저장소에 저장
-        FileOutputStream fos;
-        try {
-            fos = openFileOutput("test.txt", Context.MODE_PRIVATE);
-            fos.write("test".getBytes());
-            fos.close();
-            Toast.makeText(getApplicationContext(), "파일 추가 성공", Toast.LENGTH_SHORT).show();
-        } catch (Exception e) {
+        while (cur.moveToNext()) {
+            String itemName = cur.getString(itemName_col);
+            int itemPrice = cur.getInt(itemPrice_col);
+            byte[] itemImage = cur.getBlob(itemImage_col);
+            Bitmap bm = BitmapFactory.decodeByteArray(itemImage, 0, itemImage.length);
 
+            adapter.addItem(new SampleData(bm, itemName, ""+itemPrice));
+
+            Log.d("recycle",itemName + itemPrice + itemImage);
         }
+        adapter.notifyDataSetChanged();
 
+        cur.close();
+        db.close();
     }
 
-    public void bt2(View view, String imgName) {    // 이미지 삭제
-        try {
-            File file = getCacheDir();  // 내부저장소 캐시 경로를 받아오기
-            File[] flist = file.listFiles();
-            for (int i = 0; i < flist.length; i++) {    // 배열의 크기만큼 반복
-                if (flist[i].getName().equals(imgName)) {   // 삭제하고자 하는 이름과 같은 파일명이 있으면 실행
-                    flist[i].delete();  // 파일 삭제
-                    Toast.makeText(getApplicationContext(), "파일 삭제 성공", Toast.LENGTH_SHORT).show();
-                }
-            }
-        } catch (Exception e) {
-            Toast.makeText(getApplicationContext(), "파일 삭제 실패", Toast.LENGTH_SHORT).show();
-        }
-    }
 }
