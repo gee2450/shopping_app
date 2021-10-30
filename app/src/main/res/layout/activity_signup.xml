@@ -15,6 +15,7 @@
         android:layout_marginTop="20dp"
         android:layout_marginHorizontal="20dp"
         android:text="기본 정보"
+        android:textSize="20dp"
         android:textColor="@color/black"
         android:textAlignment="textStart"
         android:clickable="false"
@@ -97,13 +98,19 @@
 
     </LinearLayout>
 
+    <View
+        android:layout_marginHorizontal="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="2px"
+        android:background="@color/black"/>
+
     <Button
         android:id="@+id/btnDetailInfo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="0dp"
-        android:layout_marginTop="20dp"
         android:layout_marginHorizontal="20dp"
+        android:textSize="20dp"
         android:text="상세 정보"
         android:textColor="@color/black"
         android:textAlignment="textStart"
@@ -114,7 +121,7 @@
         android:id="@+id/detailInfoContents"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="20dp"
+        android:layout_marginHorizontal="20dp"
         android:orientation="vertical" >
 
         <LinearLayout
@@ -137,7 +144,7 @@
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:inputType="phone"
-                android:hint="phone Number"/>
+                android:hint="전화번호"/>
 
             <EditText
                 android:id="@+id/editTextAddress"
@@ -145,31 +152,72 @@
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:inputType="textPersonName"
-                android:hint="address" />
+                android:hint="이메일 주소" />
 
             <TextView
                 android:id="@+id/textView2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textSize="20dp"
+                android:textColor="@color/black"
+                android:layout_marginTop="10dp"
                 android:text="약관 동의" />
 
             <CheckBox
-                android:id="@+id/checkBox"
+                android:id="@+id/checkAllBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="CheckBox" />
+                android:text="전체 선택" />
 
-            <CheckBox
-                android:id="@+id/checkBox2"
+            <View
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="CheckBox" />
+                android:layout_height="2px"
+                android:background="@color/black"/>
 
-            <CheckBox
-                android:id="@+id/checkBox3"
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="CheckBox" />
+                android:layout_height="wrap_content">
+
+                <CheckBox
+                    android:id="@+id/checkBox1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="0dp"
+                    android:layout_toLeftOf="@+id/btnText1"
+                    android:paddingVertical="0dp"
+                    android:text="이용약관동의" />
+
+                <Button
+                    android:id="@+id/btnText1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:text="약관보기" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <CheckBox
+                    android:id="@+id/checkBox2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="0dp"
+                    android:layout_toLeftOf="@+id/btnText2"
+                    android:paddingVertical="0dp"
+                    android:text="개인정보취급약관 동의" />
+
+                <Button
+                    android:id="@+id/btnText2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:text="약관보기" />
+
+            </RelativeLayout>
+
 
         </LinearLayout>
 
