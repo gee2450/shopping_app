@@ -5,8 +5,11 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 public class MySQLite extends SQLiteOpenHelper {
+    public static MySQLite instance;
+
     public MySQLite(Context context) {
         super(context, "shoppingApp.db", null, 1);
+        instance = this;
     }
 
     @Override

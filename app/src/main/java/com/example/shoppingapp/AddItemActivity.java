@@ -83,9 +83,9 @@ public class AddItemActivity extends AppCompatActivity {
             });
 
     private void AddItem() {
-        MySQLite mDBHelpher = new MySQLite(this);
+        MySQLite mDBHelper = MySQLite.instance;
 
-        SQLiteDatabase db = mDBHelpher.getWritableDatabase();
+        SQLiteDatabase db = mDBHelper.getWritableDatabase();
 
         EditText clothName = (EditText) findViewById(R.id.editTextAddItemName);
         EditText clothPrice = (EditText) findViewById(R.id.editTextAddItemPrice);
@@ -118,7 +118,6 @@ public class AddItemActivity extends AppCompatActivity {
         db.insert("items", null, values);
 
         db.close();
-        mDBHelpher.close();
 
         adapter.addItem(new SampleData(newItemId, itemImage, newItemName, ""+newItemPrice));
         adapter.notifyDataSetChanged();

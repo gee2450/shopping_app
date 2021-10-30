@@ -58,8 +58,8 @@ public class HomeFragment extends Fragment {
         ActionBar actionBar = ((MainActivity) getActivity()).getSupportActionBar();
         actionBar.setDisplayShowHomeEnabled(true);
 
-        adapter = new ClothAdapter(this, rootView);
-        mDBHelper = new MySQLite((MainActivity)getActivity());
+        adapter = new ClothAdapter(rootView);
+        mDBHelper = MySQLite.instance;
 
         // 사진 테이블 저장용 코드
 //        saveImageToTable();
@@ -104,6 +104,7 @@ public class HomeFragment extends Fragment {
                         public void onClick(DialogInterface dialog, int which) {
                             for (int itemId : deleteItemsIdArray) {
                                 DeleteClothData(itemId);
+                                ((MainActivity) getActivity()).GoHome();
                             }
                             adapter.notifyDataSetChanged();
                         }
@@ -177,7 +178,6 @@ public class HomeFragment extends Fragment {
         SQLiteDatabase db = mDBHelper.getWritableDatabase();
 
         db.delete("items", "itemId = ?", new String[]{ String.valueOf(id) });
-
         adapter.deleteItem(id);
 
         db.close();

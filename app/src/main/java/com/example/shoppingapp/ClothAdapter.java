@@ -14,13 +14,15 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 
 public class ClothAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    public static ClothAdapter instance;
 
     ArrayList<SampleData> sample = new ArrayList<>();
-    HomeFragment homeFragment;
+    ArrayList<ItemViewHolder> holders = new ArrayList<>();
+
     ViewGroup viewGroup;
 
-    ClothAdapter(HomeFragment homeFragment, ViewGroup viewGroup) {
-        this.homeFragment = homeFragment;
+    ClothAdapter(ViewGroup viewGroup) {
+        instance = this;
         this.viewGroup = viewGroup;
     }
 
@@ -28,7 +30,11 @@ public class ClothAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.sample_item, parent, false);
-        return new ItemViewHolder(view);
+
+        ItemViewHolder holder = new ItemViewHolder(view);
+        holders.add(holder);
+
+        return holder;
     }
 
     @Override
@@ -50,6 +56,12 @@ public class ClothAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             if (data.getClothId() == itemId) {
                 sample.remove(sample.indexOf(data));
             }
+        }
+    }
+
+    public void ResetAllCard() {
+        for (ItemViewHolder holder : holders) {
+            holder.ResetCard();
         }
     }
 
@@ -77,12 +89,13 @@ public class ClothAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                     if (viewGroup.findViewById(R.id.btnDelete).getVisibility() != View.VISIBLE) {
                         return;
                     }
+
                     if (data.isClick()) {
-                        homeFragment.RemoveItemArray(data.getClothId());
+                        HomeFragment.instance.RemoveItemArray(data.getClothId());
                         sampleData.setBackgroundColor(Color.WHITE);
                     }
                     else {
-                        homeFragment.AddItemArray(data.getClothId());
+                        HomeFragment.instance.AddItemArray(data.getClothId());
                         sampleData.setBackgroundColor(Color.parseColor("#11111111"));
                     }
                     data.setClick(!data.isClick());
@@ -93,6 +106,11 @@ public class ClothAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             clothPrice = (TextView) itemView.findViewById(R.id.clothPrice);
         }
 
+        void ResetCard() {
+            data.setClick(false);
+            sampleData.setBackgroundColor(Color.WHITE);
+        }
+
         void onBind(SampleData data) {
             this.data = data;
             imageView.setImageBitmap(data.getCloth());
@@ -101,13 +119,4 @@ public class ClothAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         }
     }
 
-//    public View getView(int position, View converView, ViewGroup parent) {
-//        View view = mLayoutInflater.inflate(R.layout.sample_item, null);
-//
-//        imageView.setImageBitmap(sample.get(position).getCloth());
-//        clothName.setText(sample.get(position).getClothName());
-//        clothPrice.setText(sample.get(position).getClothPrice()+"원");
-//
-//        return view;
-//    }
 }

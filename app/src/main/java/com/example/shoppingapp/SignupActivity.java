@@ -53,7 +53,7 @@ public class SignupActivity extends AppCompatActivity {
         // 뒤로가기 버튼 생성
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        mDBHelper = new MySQLite(this);
+        mDBHelper = MySQLite.instance;
 
         // EditText 연동
         idInput = (EditText) findViewById(R.id.editTextId);
@@ -360,7 +360,7 @@ public class SignupActivity extends AppCompatActivity {
         values.put("address", addressInput.getText().toString());
         db.insert("userTable", null, values);
 
-        mDBHelper.close();
+        db.close();
     }
 
     // 뒤로가기 버튼 코드 구현
