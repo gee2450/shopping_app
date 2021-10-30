@@ -35,7 +35,7 @@
         android:layout_height="wrap_content"
         android:ems="10"
         android:hint="상품 가격"
-        android:inputType="textPersonName"
+        android:inputType="number"
         app:layout_constraintEnd_toEndOf="@+id/editTextAddItemName"
         app:layout_constraintStart_toStartOf="@+id/editTextAddItemName"
         app:layout_constraintTop_toBottomOf="@+id/editTextAddItemName" />

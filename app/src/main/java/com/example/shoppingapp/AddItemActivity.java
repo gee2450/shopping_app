@@ -5,6 +5,7 @@ import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.ContentValues;
@@ -29,6 +30,13 @@ public class AddItemActivity extends AppCompatActivity {
 
     ClothAdapter adapter;
 
+    EditText clothName;
+    EditText clothPrice;
+
+    boolean isSelectImage = false;
+
+    String dialogMessage = "";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,6 +45,9 @@ public class AddItemActivity extends AppCompatActivity {
         adapter = HomeFragment.instance.adapter;
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        clothName = (EditText) findViewById(R.id.editTextAddItemName);
+        clothPrice = (EditText) findViewById(R.id.editTextAddItemPrice);
 
         imageView = (ImageView) findViewById(R.id.itemImage);
         imageView.setOnClickListener(new View.OnClickListener() {
@@ -53,6 +64,10 @@ public class AddItemActivity extends AppCompatActivity {
         btnComplete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (!Check()) {
+                    MakeDialog("Error");
+                    return;
+                }
                 AddItem();
                 finish();
             }
@@ -68,17 +83,48 @@ public class AddItemActivity extends AppCompatActivity {
                         Intent intent = result.getData();
                         Uri uri = intent.getData();
                         imageView.setImageURI(uri);
+                        isSelectImage = true;
                     }
                 }
             });
 
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
+            case android.R.id.home:{ // android.R.id.home : toolbar 의back
+                finish();
+                return true;
+            }
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private boolean Check() {
+        if (!isSelectImage) {
+            dialogMessage = "이미지를 선택해주세요. ";
+            return false;
+        }
+        else if (clothName.getText().toString().equals("")) {
+            dialogMessage = "상품 이름을 적어주세요. ";
+            return false;
+        }
+        else if (clothPrice.getText().toString().equals("")) {
+            dialogMessage = "상품 가격을 적어주세요. ";
+            return false;
+        }
+        return true;
+    }
+
+    private void MakeDialog(String title) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(AddItemActivity.this);
+        builder.setTitle(title);
+        builder.setMessage(dialogMessage);
+        builder.setPositiveButton("OK", null);
+        builder.create().show();
+    }
+
     private void AddItem() {
-        MySQLite mDBHelper = MySQLite.instance;
-
-        SQLiteDatabase db = mDBHelper.getWritableDatabase();
-
-        EditText clothName = (EditText) findViewById(R.id.editTextAddItemName);
-        EditText clothPrice = (EditText) findViewById(R.id.editTextAddItemPrice);
+        SQLiteDatabase db = MySQLite.instance.getWritableDatabase();
 
         // 가장 큰 itemId 가져오기 위해 SQLite에서 모든 아이템 id 가져오기
         Cursor cur = db.query("items", new String[]{"itemId"}, null, null, null, null, "itemId");
@@ -111,16 +157,5 @@ public class AddItemActivity extends AppCompatActivity {
 
         adapter.addItem(new SampleData(newItemId, itemImage, newItemName, ""+newItemPrice));
         adapter.notifyDataSetChanged();
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()){
-            case android.R.id.home:{ // android.R.id.home : toolbar 의back
-                finish();
-                return true;
-            }
-        }
-        return super.onOptionsItemSelected(item);
     }
 }
