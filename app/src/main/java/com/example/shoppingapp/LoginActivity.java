@@ -51,7 +51,6 @@ public class LoginActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
         btnLogIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -71,7 +70,6 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         });
-
         btnMain.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
