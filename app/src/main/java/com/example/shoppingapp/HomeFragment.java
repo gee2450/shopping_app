@@ -1,9 +1,7 @@
 package com.example.shoppingapp;
 
-import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
@@ -26,7 +24,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 
 public class HomeFragment extends Fragment {
@@ -60,9 +57,6 @@ public class HomeFragment extends Fragment {
 
         adapter = new ClothAdapter(rootView);
         mDBHelper = MySQLite.instance;
-
-        // 사진 테이블 저장용 코드
-//        saveImageToTable();
 
         RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.itemRecyclerList);
 
@@ -139,27 +133,6 @@ public class HomeFragment extends Fragment {
         btnAddVis = add;
         btnDelete.setVisibility(delete);
         btnDeleteVis = delete;
-    }
-
-    private void saveImageToTable() {
-        SQLiteDatabase db = mDBHelper.getWritableDatabase();
-
-        String[] clothes = new String[] {"와이셔츠", "청바지", "치마", "맨투맨", "신발"};
-        int[] clothesImage = new int[] {R.drawable.shirt, R.drawable.jeans, R.drawable.skirt, R.drawable.sweatshirt, R.drawable.shoes};
-
-        for (int i = 0; i<clothes.length; i++) {
-            Bitmap itemImage = BitmapFactory.decodeResource(getResources(), clothesImage[i]);
-            ByteArrayOutputStream baos= new ByteArrayOutputStream();
-            itemImage.compress(Bitmap.CompressFormat.JPEG, 70, baos);
-            byte[] bytes = baos.toByteArray();
-
-            ContentValues values = new ContentValues();
-            values.put("itemImage", bytes);
-
-            db.update("items", values, "itemName=?", new String[]{clothes[i]});
-        }
-
-        db.close();
     }
 
     public void AddItemArray( int itemId ) {

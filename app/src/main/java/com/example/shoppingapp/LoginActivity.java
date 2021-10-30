@@ -45,8 +45,6 @@ public class LoginActivity extends AppCompatActivity {
         btnSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getApplicationContext(), "회원가입", Toast.LENGTH_SHORT).show();
-
                 Intent intent = new Intent(getApplicationContext(), SignupActivity.class);
                 startActivity(intent);
             }
@@ -57,14 +55,8 @@ public class LoginActivity extends AppCompatActivity {
                 boolean result = logIn();
 
                 if (result) {
-                    Toast.makeText(getApplicationContext(), "로그인 성공", Toast.LENGTH_SHORT).show();
-
                     Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                    intent.putExtra("isGuest", isGuest);
-                    intent.putExtra("id", id);
-                    intent.putExtra("userName", userName);
-                    intent.putExtra("phoneNum", phoneNum);
-                    intent.putExtra("address", address);
+                    intent = PutExtra(intent);
                     startActivity(intent);
                     finish();
                 }
@@ -73,13 +65,21 @@ public class LoginActivity extends AppCompatActivity {
         btnMain.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getApplicationContext(), "로그인 없이 앱 이용하기", Toast.LENGTH_SHORT).show();
-
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 startActivity(intent);
                 finish();
             }
         });
+    }
+
+    private Intent PutExtra(Intent intent) {
+        intent.putExtra("isGuest", isGuest);
+        intent.putExtra("id", id);
+        intent.putExtra("userName", userName);
+        intent.putExtra("phoneNum", phoneNum);
+        intent.putExtra("address", address);
+
+        return intent;
     }
 
     private boolean logIn() {
