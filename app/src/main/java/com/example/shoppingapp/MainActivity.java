@@ -1,62 +1,90 @@
 package com.example.shoppingapp;
 
-import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.util.Log;
-import android.widget.Toast;
+import android.view.View;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-import java.io.ByteArrayOutputStream;
 
 public class MainActivity extends AppCompatActivity {
-    ClothAdapter adapter;
+    HomeFragment homeFragment;
+    ProfileFragment profileFragment;
 
-    MySQLite mDBHelper;
+    public Intent intent;
+
+    BottomNavigationView bottomNavigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mDBHelper = new MySQLite(this);
-        adapter = new ClothAdapter();
+        intent = getIntent();
 
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.itemRecyclerList);
+        homeFragment = new HomeFragment();
+        profileFragment = new ProfileFragment(intent);
 
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(linearLayoutManager);
+        //첫 화면 띄우기
+        getSupportFragmentManager().beginTransaction().add(R.id.mainContainer, homeFragment).commit();
 
-        recyclerView.setAdapter(adapter);
-
-//        saveImageToTable();
-
-        InitializeClothData();
-
-        BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottomNav);
+        bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottomNav);
         bottomNavigationView.setSelectedItemId(R.id.main_menu_item_home);
 
         bottomNavigationView.setOnItemSelectedListener(item -> {
             switch (item.getItemId()) {
                 case R.id.main_menu_item_delete:
+                    HomeFragment.instance.setButtonVisibility(View.GONE, View.VISIBLE);
+                    getSupportFragmentManager().beginTransaction().replace(R.id.mainContainer, homeFragment).commit();
+                    HomeFragment.instance.ResetItemArray();
                     break;
                 case R.id.main_menu_item_home:
+                    ClothAdapter.instance.ResetAllCard();
+                    HomeFragment.instance.ResetItemArray();
+                    HomeFragment.instance.setButtonVisibility(View.VISIBLE, View.GONE);
+                    getSupportFragmentManager().beginTransaction().replace(R.id.mainContainer, homeFragment).commit();
+                    HomeFragment.instance.ResetItemArray();
                     break;
                 case R.id.main_menu_item_profile:
-                    Toast.makeText(getApplicationContext(), "회원가입", Toast.LENGTH_SHORT).show();
-
-                    Intent intent = new Intent(getApplicationContext(), SignupActivity.class);
-                    startActivity(intent);
-                    finish();
+                    boolean isGuest = intent.getBooleanExtra("isGuest", true);
+                    if (!isGuest) {
+                        getSupportFragmentManager().beginTransaction().replace(R.id.mainContainer, profileFragment).commit();
+                    }
+                    else {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                        builder.setTitle("Guest Login");
+                        builder.setMessage("이 창은 회원가입자에게만 제공되는 창입니다. " +
+                                "로그인 하시겠습니까? 아니면 회원가입하시겠습니까? ");
+                        builder.setNeutralButton("취소", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                GoHome();
+                            }
+                        });
+                        builder.setNegativeButton("로그인", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                                startActivity(intent);
+                                finish();
+                            }
+                        });
+                        builder.setPositiveButton("회원가입", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                                startActivity(intent);
+                                intent = new Intent(getApplicationContext(), SignupActivity.class);
+                                startActivity(intent);
+                                finish();
+                            }
+                        });
+                        builder.create().show();
+                    }
                     break;
                 default:
                     return false;
@@ -66,80 +94,9 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-
-    private void saveImageToTable() {
-        Bitmap itemImage;
-        ByteArrayOutputStream baos;
-        byte[] bytes;
-
-        ContentValues values = new ContentValues();
-        itemImage = BitmapFactory.decodeResource(getResources(), R.drawable.shirt);
-        baos= new ByteArrayOutputStream();
-        itemImage.compress(Bitmap.CompressFormat.JPEG, 70, baos);
-        bytes = baos.toByteArray();
-        values.put("itemImage", bytes);
-        SQLiteDatabase db = mDBHelper.getWritableDatabase();
-        db.update("items", values, "itemName=?", new String[]{"와이셔츠"});
-
-        values = new ContentValues();
-        itemImage = BitmapFactory.decodeResource(getResources(), R.drawable.jeans);
-        baos= new ByteArrayOutputStream();
-        itemImage.compress(Bitmap.CompressFormat.JPEG, 70, baos);
-        bytes = baos.toByteArray();
-        values.put("itemImage", bytes);
-        db.update("items", values, "itemName=?", new String[]{"청바지"});
-
-        values = new ContentValues();
-        itemImage = BitmapFactory.decodeResource(getResources(), R.drawable.skirt);
-        baos= new ByteArrayOutputStream();
-        itemImage.compress(Bitmap.CompressFormat.JPEG, 70, baos);
-        bytes = baos.toByteArray();
-        values.put("itemImage", bytes);
-        db.update("items", values, "itemName=?", new String[]{"치마"});
-
-        values = new ContentValues();
-        itemImage = BitmapFactory.decodeResource(getResources(), R.drawable.sweatshirt);
-        baos= new ByteArrayOutputStream();
-        itemImage.compress(Bitmap.CompressFormat.JPEG, 70, baos);
-        bytes = baos.toByteArray();
-        values.put("itemImage", bytes);
-        db.update("items", values, "itemName=?", new String[]{"맨투맨"});
-
-        values = new ContentValues();
-        itemImage = BitmapFactory.decodeResource(getResources(), R.drawable.shoes);
-        baos= new ByteArrayOutputStream();
-        itemImage.compress(Bitmap.CompressFormat.JPEG, 70, baos);
-        bytes = baos.toByteArray();
-        values.put("itemImage", bytes);
-        db.update("items", values, "itemName=?", new String[]{"신발"});
-
-        db.close();
+    public void GoHome() {
+        ClothAdapter.instance.ResetAllCard();
+        HomeFragment.instance.ResetItemArray();
+        bottomNavigationView.setSelectedItemId(R.id.main_menu_item_home);
     }
-
-
-    private void InitializeClothData() {
-        SQLiteDatabase db = mDBHelper.getReadableDatabase();
-        String[] projection = {"itemId", "itemName", "itemPrice", "itemImage"};
-        Cursor cur = db.query("items", projection, null, null, null, null, null);
-
-        int itemName_col = cur.getColumnIndex("itemName");
-        int itemPrice_col = cur.getColumnIndex("itemPrice");
-        int itemImage_col = cur.getColumnIndex("itemImage");
-
-        while (cur.moveToNext()) {
-            String itemName = cur.getString(itemName_col);
-            int itemPrice = cur.getInt(itemPrice_col);
-            byte[] itemImage = cur.getBlob(itemImage_col);
-            Bitmap bm = BitmapFactory.decodeByteArray(itemImage, 0, itemImage.length);
-
-            adapter.addItem(new SampleData(bm, itemName, ""+itemPrice));
-
-            Log.d("recycle",itemName + itemPrice + itemImage);
-        }
-        adapter.notifyDataSetChanged();
-
-        cur.close();
-        db.close();
-    }
-
 }
