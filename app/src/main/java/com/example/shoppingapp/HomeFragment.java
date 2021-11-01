@@ -122,12 +122,6 @@ public class HomeFragment extends Fragment {
         adapter.notifyDataSetChanged();
     }
 
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.top_menu_add_items, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
     public void setButtonVisibility(int add, int delete) {
         btnAdd.setVisibility(add);
         btnAddVis = add;
